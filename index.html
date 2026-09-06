@@ -298,13 +298,26 @@ async function loadData(){
     var data=await atFetch(url);
     var recs=data.records||[];
 
-    // 기록된 반 이름 수집
+    // 반 테이블에서 레코드ID -> 반이름 맵 만들기 (반 필드가 링크 타입이라 ID로 옴)
+    var idToName={};
+    try{
+      var cdata=await atFetch('/'+c.base+'/'+encodeURIComponent('반별')+'?fields%5B%5D='+encodeURIComponent('반 이름')+'&pageSize=100');
+      (cdata.records||[]).forEach(function(cr){
+        var nm=cr.fields['반 이름'];
+        if(nm)idToName[cr.id]=String(nm);
+      });
+    }catch(e){}
+
+    // 기록된 반 이름 수집 (ID면 이름으로 변환)
     var written=[];
     recs.forEach(function(r){
       var v=r.fields['반'];
       if(!v)return;
-      if(Array.isArray(v)) v.forEach(function(x){written.push(String(x));});
-      else written.push(String(v));
+      var arr=Array.isArray(v)?v:[v];
+      arr.forEach(function(x){
+        var s=String(x);
+        written.push(idToName[s]||s);
+      });
     });
 
     // 미작성 / 작성완료 분류
