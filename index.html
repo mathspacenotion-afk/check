@@ -293,7 +293,7 @@ async function loadData(){
 
   try{
     // 오늘 날짜 기록 조회
-    var filter='IS_SAME({수업일시},"'+today+'","day")';
+    var filter='DATETIME_FORMAT({수업일시},"YYYY-MM-DD")="'+today+'"';
     var url='/'+c.base+'/'+encodeURIComponent(c.tbl)+'?filterByFormula='+encodeURIComponent(filter);
     var data=await atFetch(url);
     var recs=data.records||[];
